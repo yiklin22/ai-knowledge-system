@@ -5,3 +5,6 @@ Append-only. Each entry starts with `## [YYYY-MM-DD] <operation> | <title>` so i
 
 ## [2026-11-06] init | Wiki created
 Topic: AI. Empty skeleton: raw/, wiki/index.md, wiki/log.md.
+
+## [2026-11-06] schema | CLAUDE.md v1
+Defined core types, frontmatter, relations, body sections, tagging, validation rules.
