@@ -1,0 +1,9 @@
+# Controlled vocabulary of knowledge domains. Add deliberately; every page must use these.
+ai: Artificial intelligence, ML, LLMs, agents
+programming: Software engineering, tools, systems
+work: Work documents, projects, processes, decisions
+business: Strategy, products, markets, finance
+science: Natural sciences, math, research methods
+health: Body, mind, medicine, habits
+learning: Learning methods, thinking, productivity
+personal: Personal decisions, preferences, life admin

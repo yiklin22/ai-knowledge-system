@@ -1,0 +1,5 @@
+trafilatura
+yt-dlp
+youtube-transcript-api
+pypdf
+pyyaml
