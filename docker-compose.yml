@@ -1,0 +1,15 @@
+services:
+  kb:
+    build: .
+    ports:
+      - "127.0.0.1:8765:8765"   # never publish this on 0.0.0.0: the app holds your private documents
+    volumes:                    # your knowledge stays on your disk, outside the image
+      - ./vault:/app/vault
+      - ./raw:/app/raw
+      - ./proposals:/app/proposals
+      - ./data:/app/data
+      - ./build:/app/build
+      - hf-cache:/root/.cache
+    restart: unless-stopped
+volumes:
+  hf-cache:

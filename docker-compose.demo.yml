@@ -1,0 +1,19 @@
+# Try the app on the sample vault, without any of your own data:
+#   docker compose -f docker-compose.demo.yml up --build      then open http://127.0.0.1:8766
+# The sample vault is copied into the container at start, so anything you approve or grade is gone when it stops.
+# Library, search, learning map, flashcards and Review work as-is. Ask answers, digest and the tutor call the
+# `claude` CLI, which is not in the image.
+services:
+  demo:
+    build: .
+    ports:
+      - "127.0.0.1:8766:8766"
+    environment:
+      KB_PORT: "8766"
+    volumes:
+      - ./demo:/demo:ro
+    command: sh -c "cp -r /demo/vault /demo/raw /demo/proposals /app/ && python -m tools.kb build && python -m app.server"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen(u.Request('http://127.0.0.1:8766/api/health', headers={'Host':'127.0.0.1:8766'}))"]
+      interval: 30s
+      timeout: 5s

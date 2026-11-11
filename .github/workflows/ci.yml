@@ -1,0 +1,27 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.12", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Unit, security and retrieval-evaluation tests
+        run: python -m unittest discover -s tests -t .
+      - name: Prompt-injection red team (structural layers; fails if any attack is not blocked)
+        run: python -m tools.kb.redteam
+      - name: Digest-quality checks on the sample vault
+        run: python -c "from pathlib import Path; from tools.kb import digest_eval as d; r = d.evaluate(Path('demo')); print(d.render(r)); assert not r['errors'] and not r['citations']['not_verbatim']"
+      # `kb validate` is a local check: it verifies quotes against raw/, which is private and not in the repo.
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t knowledge-system .

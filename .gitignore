@@ -2,5 +2,54 @@
 .DS_Store
 build/
 data/learning.db
+data/uploads/
+data/tutor/
+data/builds/
+data/conceptmaps/
+data/annotations.json
 vault/.obsidian/workspace*.json
 __pycache__/
+data/jobs.json
+data/maps/
+data/clipper.key
+
+# ---- secrets (never commit) ----
+.env
+.env.*
+*.key
+*.pem
+*.p12
+credentials*.json
+secrets*
+.claude/settings.local.json
+CLAUDE.local.md
+
+# ---- private runtime data: learning history, tutor chats, uploads, maps, job logs, clip key ----
+data/*
+!data/.gitkeep
+
+# ---- private reading material ----
+# Scraped third-party articles (some paywalled), video transcripts, PDFs and personal AI chats are your private
+# source library, not part of the code. Folders stay (via .gitkeep); contents stay on your machine.
+raw/web/*
+raw/videos/*
+raw/documents/*
+raw/chats/*
+raw/assets/*
+!raw/*/.gitkeep
+
+# ---- derived / local ----
+build/
+*.log
+nohup.out
+vault/.obsidian/workspace*.json
+vault/.obsidian/cache
+vault/.trash/
+.pytest_cache/
+.idea/
+.vscode/
+*.egg-info/
+
+# ---- sample vault: runtime leftovers only (the sample pages themselves are tracked) ----
+demo/data/
+demo/build/
