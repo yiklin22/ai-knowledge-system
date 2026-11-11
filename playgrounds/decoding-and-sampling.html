@@ -1,0 +1,45 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Decoding and sampling playground</title>
+<style>
+:root{--bg:#fafaf8;--ink:#1d2127;--muted:#6b7280;--line:#e4e4df;--panel:#fff;--accent:#3b5bdb;--ok:#2f9e6b;--bad:#c92a2a}
+@media(prefers-color-scheme:dark){:root{--bg:#14161a;--ink:#e6e8ec;--muted:#98a0ad;--line:#2b2f37;--panel:#1b1e24;--accent:#7c93ff;--ok:#4cc38a;--bad:#ff6b6b}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,sans-serif;padding:14px}
+h1{font-size:19px;margin:0 0 4px}.sub{color:var(--muted);margin:0 0 12px;font-size:13px}.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:minmax(240px,1fr) minmax(0,1.6fr);gap:12px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+label{display:block;font-size:13px;margin-top:10px}label b{font-variant-numeric:tabular-nums;color:var(--accent)}input[type=range]{width:100%}
+button{background:var(--accent);color:var(--bg);border:0;border-radius:8px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer;margin:8px 6px 0 0}button.g{background:var(--line);color:var(--ink)}
+.opt{display:block;width:100%;text-align:left;background:var(--bg);color:var(--ink);border:1px solid var(--line);margin:6px 0}.opt.sel{border-color:var(--accent)}
+.row{display:grid;grid-template-columns:78px 1fr 52px;gap:8px;align-items:center;margin:5px 0;font-size:13px}.bar{height:18px;border-radius:4px;background:var(--line);position:relative;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);transition:width .25s}.bar u{position:absolute;top:0;bottom:0;width:3px;background:var(--ok);transition:left .25s}.row.off{opacity:.35}.row.off .bar i{background:var(--muted)}
+.stat{font-size:13px;margin-top:10px;font-variant-numeric:tabular-nums}#out{font-size:15px;margin-top:8px;line-height:2}.tok{background:var(--line);border-radius:5px;padding:1px 6px;margin-right:4px}
+#reveal{display:none;border-left:3px solid var(--accent);padding-left:10px;margin-top:10px;font-size:14px}.legend{color:var(--muted);font-size:12px;margin-top:6px}
+</style></head><body>
+<h1>Decoding and sampling playground</h1><p class="sub">The model scores every possible next token for &ldquo;The cat sat on the&hellip;&rdquo;. Temperature, top-k and top-p reshape those scores before one token is drawn. The scores are made up for teaching.</p>
+<div class="card"><b>Predict first.</b> You set the temperature very close to 0. What does the model do?
+<button class="opt" data-a="a">It becomes random</button><button class="opt" data-a="b">It always picks the single most likely token (greedy)</button><button class="opt" data-a="c">It refuses to answer</button><div id="reveal"></div></div>
+<div class="grid"><div class="card"><label>Temperature T <b id="tv"></b><input id="t" type="range" min="0.05" max="2.5" step="0.05" value="1"></label>
+<label>Top-k <b id="kv"></b><input id="k" type="range" min="1" max="10" step="1" value="10"></label>
+<label>Top-p (nucleus) <b id="pv"></b><input id="p" type="range" min="0.1" max="1" step="0.05" value="1"></label>
+<div><button id="s1">Sample 1 token</button><button id="s200">Sample 200</button><button id="clr" class="g">Clear</button></div>
+<div class="stat">Entropy: <b id="ent"></b> bits &nbsp; Kept tokens: <b id="kept"></b></div><div class="legend">Order: scale by T, softmax, keep top-k, then keep the smallest set reaching top-p, renormalise.</div></div>
+<div class="card"><div id="bars"></div><div class="legend"><span style="color:var(--ok)">&#9646;</span> green tick = how often that token was actually drawn in your samples</div><div id="out"></div></div></div>
+<script>
+const $=id=>document.getElementById(id);
+const toks=[["mat",4.0],["floor",3.4],["sofa",3.2],["bed",2.8],["table",2.2],["roof",1.8],["dog",1.0],["moon",0.4],["keyboard",-0.5],["idea",-2.0]];
+let counts=toks.map(()=>0),total=0;
+function dist(){const T=+$("t").value,K=+$("k").value,Pp=+$("p").value;
+ const z=toks.map(t=>t[1]/T),m=Math.max(...z),e=z.map(v=>Math.exp(v-m)),s=e.reduce((a,b)=>a+b,0);let pr=e.map(v=>v/s);
+ const order=pr.map((v,i)=>i).sort((a,b)=>pr[b]-pr[a]);let keep=new Set(order.slice(0,K));
+ let cum=0,k2=new Set();for(const i of order){if(!keep.has(i))continue;k2.add(i);cum+=pr[i];if(cum>=Pp)break}
+ const z2=pr.map((v,i)=>k2.has(i)?v:0),t2=z2.reduce((a,b)=>a+b,0);return{full:pr,final:z2.map(v=>v/t2),kept:k2}}
+function draw(){const T=+$("t").value;$("tv").textContent=T.toFixed(2);$("kv").textContent=$("k").value;$("pv").textContent=(+$("p").value).toFixed(2);
+ const d=dist();$("bars").innerHTML=toks.map((t,i)=>{const on=d.kept.has(i),w=(d.final[i]*100).toFixed(1),emp=total?(counts[i]/total*100):0;
+  return `<div class="row ${on?"":"off"}"><span>${t[0]}</span><div class="bar"><i style="width:${w}%"></i>${total?`<u style="left:calc(${emp}% - 1px)"></u>`:""}</div><span>${w}%</span></div>`}).join("");
+ const H=-d.final.reduce((a,p)=>p>0?a+p*Math.log2(p):a,0);$("ent").textContent=H.toFixed(2);$("kept").textContent=d.kept.size+" / "+toks.length}
+function draw1(){const d=dist();let r=Math.random(),c=0;for(let i=0;i<toks.length;i++){c+=d.final[i];if(r<c)return i}return toks.findIndex((_,i)=>d.final[i]>0)}
+function sample(n){for(let j=0;j<n;j++){const i=draw1();counts[i]++;total++;if(n==1)$("out").innerHTML+=`<span class="tok">${toks[i][0]}</span>`}if(n>1)$("out").innerHTML=`<span class="muted">${total} samples drawn. Compare the green ticks with the bars.</span>`;draw()}
+$("s1").onclick=()=>sample(1);$("s200").onclick=()=>sample(200);$("clr").onclick=()=>{counts=toks.map(()=>0);total=0;$("out").innerHTML="";draw()};
+["t","k","p"].forEach(i=>$(i).oninput=()=>{counts=toks.map(()=>0);total=0;draw()});
+document.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{document.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel"));o.classList.add("sel");const r=$("reveal");r.style.display="block";
+ r.innerHTML=(o.dataset.a=="b"?"<b>Right.</b> ":"<b>Not quite.</b> ")+"Dividing the scores by a tiny T exaggerates the gaps, so nearly all probability lands on the top token: effectively greedy decoding. Large T flattens the distribution toward uniform. Drag T both ways and watch the entropy readout.";});
+draw();
+</script></body></html>

@@ -1,0 +1,28 @@
+<!doctype html>
+<meta charset="utf-8">
+<style>
+  body { width: 280px; margin: 0; padding: 14px; font: 14px system-ui, sans-serif; color: #1f2937; }
+  h1 { font-size: 15px; margin: 0 0 10px; }
+  button { width: 100%; padding: 9px; margin-bottom: 8px; border: 0; border-radius: 6px; background: #2563eb; color: #fff; font-size: 14px; cursor: pointer; }
+  button.alt { background: #e5e7eb; color: #1f2937; }
+  button:disabled { opacity: .5; cursor: default; }
+  input[type=text] { width: 100%; box-sizing: border-box; padding: 7px; margin: 4px 0 8px; }
+  label { display: block; margin: 6px 0; }
+  #msg { margin-top: 8px; font-size: 13px; min-height: 18px; }
+  .err { color: #b91c1c; } .ok { color: #15803d; } small { color: #6b7280; }
+  @media (prefers-color-scheme: dark) { body { background: #111827; color: #e5e7eb; } button.alt { background: #374151; color: #e5e7eb; } small { color: #9ca3af; } }
+</style>
+<h1>Knowledge Clipper</h1>
+<div id="setup" hidden>
+  <small>Paste the clip key from <code>data/clipper.key</code> (one time).</small>
+  <input type="text" id="key" placeholder="clip key" autocomplete="off">
+  <button id="savekey">Save key</button>
+</div>
+<div id="main">
+  <button id="page">Clip this page</button>
+  <button id="sel" class="alt">Clip selection</button>
+  <label><input type="checkbox" id="digest"> Digest automatically</label>
+  <small>Saved as an untouched source; proposals still need your approval.</small>
+</div>
+<div id="msg"></div>
+<script src="popup.js"></script>

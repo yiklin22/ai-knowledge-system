@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Knowledge Clipper",
+  "version": "0.1.0",
+  "description": "Clip the page, selection, link or video you are viewing into your local knowledge system and digest it automatically.",
+  "permissions": ["activeTab", "contextMenus", "storage", "scripting", "notifications", "alarms"],
+  "host_permissions": ["http://127.0.0.1:8765/*"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_popup": "popup.html", "default_title": "Clip to knowledge system" },
+  "commands": {
+    "clip-page": {
+      "suggested_key": { "default": "Alt+Shift+K" },
+      "description": "Clip the selection (or the whole page) to the knowledge system"
+    }
+  }
+}

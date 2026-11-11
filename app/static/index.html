@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knowledge System</title>
+<link rel="stylesheet" href="/static/style.css">
+<meta name="kb-token" content="__TOKEN__">
+</head>
+<body>
+<header>
+  <a class="brand" href="#/"><span class="logo">◆</span> Knowledge</a>
+  <select id="subject" title="Switch subject"></select>
+  <nav id="nav">
+    <a href="#/" data-r="home">Home</a>
+    <a href="#/learn" data-r="learn">Learn</a>
+    <a href="#/cmap" data-r="cmap">Concept maps</a>
+    <a href="#/library" data-r="library">Library</a>
+    <a href="#/mymaps" data-r="mymaps">My maps</a>
+    <a href="#/study" data-r="study">Study Flashcards <span class="badge" id="b-study"></span></a>
+    <a href="#/ask" data-r="ask">Ask</a>
+    <a href="#/tutor" data-r="tutor">Tutor</a>
+    <a href="#/add" data-r="add">Add <span class="badge" id="b-add"></span></a>
+    <a href="#/review" data-r="review">Review <span class="badge" id="b-review"></span></a>
+  </nav>
+  <input id="gsearch" type="search" placeholder="Search the vault…" autocomplete="off">
+  <button class="ghost icon-btn" id="kbtn" title="Command palette (Ctrl+K)">⌘K</button>
+  <button class="ghost icon-btn" id="theme" title="Toggle light/dark">◐</button>
+</header>
+<div id="search-results" hidden></div>
+<main id="app"></main>
+<div id="toast" hidden></div>
+<script src="/static/vendor/marked.min.js"></script>
+<script src="/static/vendor/mermaid.min.js"></script>
+<script src="/static/core.js"></script>
+<script src="/static/views-core.js"></script>
+<script src="/static/views-learn.js"></script>
+<script src="/static/views-mymaps.js"></script>
+<script src="/static/views-ask.js"></script>
+<script src="/static/boot.js"></script>
+</body>
+</html>

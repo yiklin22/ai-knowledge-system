@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Playground: KV cache</title>
+<style>
+  :root {
+    --bg: #fafaf9; --fg: #1c1b19; --muted: #66635c; --card: #ffffff; --line: #d9d6cf;
+    --nocache: #c2570c; --cache: #1d6fb8; --new: #2a8a4a; --accent: #1d6fb8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151514; --fg: #ecebe7; --muted: #a29f97; --card: #1f1f1d; --line: #3a3935;
+      --nocache: #f08a3c; --cache: #5aa6ee; --new: #55c47a; --accent: #5aa6ee;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 1.5rem; margin: 8px 0 4px; }
+  h2 { font-size: 1.05rem; margin: 0 0 8px; }
+  .sub { color: var(--muted); margin: 0 0 16px; font-size: .92rem; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px; margin-bottom: 14px; }
+  .predict label { display: block; padding: 4px 0; cursor: pointer; }
+  .controls { display: grid; gap: 12px; }
+  .ctl { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; align-items: center; }
+  .ctl input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+  .ctl output { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .toggle { display: flex; gap: 8px; align-items: center; }
+  canvas { width: 100%; display: block; border-radius: 6px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .85rem; color: var(--muted); margin-top: 6px; }
+  .sw { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 5px 4px; border-bottom: 1px solid var(--line); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 600; }
+  .bar { height: 14px; background: var(--line); border-radius: 7px; overflow: hidden; margin: 6px 0 2px; }
+  .bar > div { height: 100%; background: var(--cache); width: 0; }
+  button { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--accent); color: #fff; cursor: pointer; }
+  #reveal[hidden] { display: none; }
+  .note { font-size: .85rem; color: var(--muted); }
+  code { background: var(--bg); padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>KV cache</h1>
+  <p class="sub">When a transformer generates text one token at a time, why keep old keys and values around?</p>
+
+  <section class="predict">
+    <h2>Predict first</h2>
+    <p>You generate 512 tokens one at a time. Without a KV cache, every step re-runs the whole prefix through the network. Roughly how many more token-positions get pushed through the network than with a cache?</p>
+    <label><input type="radio" name="guess" value="2"> about 2&times; more</label>
+    <label><input type="radio" name="guess" value="10"> about 10&times; more</label>
+    <label><input type="radio" name="guess" value="250"> about 250&times; more</label>
+    <p class="note">Commit to a guess, then play with the controls, then open the reveal.</p>
+  </section>
+
+  <section>
+    <h2>Controls</h2>
+    <div class="controls">
+      <div class="ctl">
+        <label for="n">Tokens generated (N)</label><output id="nOut"></output>
+        <input id="n" type="range" min="1" max="512" value="512">
+      </div>
+      <div class="toggle">
+        <input id="useCache" type="checkbox" checked>
+        <label for="useCache">Use KV cache (affects the strip and the highlighted row)</label>
+      </div>
+      <div class="ctl">
+        <label for="layers">Layers (L)</label><output id="layersOut"></output>
+        <input id="layers" type="range" min="1" max="80" value="32">
+      </div>
+      <div class="ctl">
+        <label for="heads">KV heads (H<sub>kv</sub>, head size 128, fp16)</label><output id="headsOut"></output>
+        <input id="heads" type="range" min="1" max="64" value="8">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Work done in the last step (step N)</h2>
+    <canvas id="strip" height="64" aria-label="Token positions processed at the final step"></canvas>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--nocache)"></span>recomputed (K, V, MLP again)</span>
+      <span><span class="sw" style="background:var(--cache)"></span>read from cache</span>
+      <span><span class="sw" style="background:var(--new)"></span>new token, computed</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Total work so far (cumulative token-positions, log scale)</h2>
+    <canvas id="chart" height="240" aria-label="Cumulative positions processed versus step, log scale"></canvas>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--nocache)"></span>no cache: 1 + 2 + &hellip; + t</span>
+      <span><span class="sw" style="background:var(--cache)"></span>cache: 1 per step</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Totals for N tokens</h2>
+    <table>
+      <thead><tr><th></th><th>No cache</th><th>Cache</th></tr></thead>
+      <tbody>
+        <tr id="rowPos"><td>Positions through the layers</td><td id="posNo"></td><td id="posYes"></td></tr>
+        <tr id="rowQK"><td>q&middot;k scores (per head, per layer)</td><td id="qkNo"></td><td id="qkYes"></td></tr>
+        <tr id="rowMem"><td>Extra memory held</td><td id="memNo"></td><td id="memYes"></td></tr>
+      </tbody>
+    </table>
+    <div class="bar"><div id="memBar"></div></div>
+    <div class="note" id="memNote"></div>
+  </section>
+
+  <section>
+    <button id="revealBtn" type="button">Reveal the explanation</button>
+    <div id="reveal" hidden>
+      <h2 style="margin-top:12px">What happened</h2>
+      <p id="answer"></p>
+      <p><b>Why.</b> Generating token t+1 needs the query of the newest position, and the keys and values of every position so far. In a decoder with a causal mask, the keys and values of old positions depend only on earlier tokens, so they never change. A cache stores them (per layer, per KV head) and each step only computes K, V (and the MLP) for the one new token, then appends.</p>
+      <p><b>What does not go away.</b> Each step still scores the new query against all t cached keys, so attention cost per step still grows with t (the q&middot;k row above drops from cubic to quadratic, not to linear).</p>
+      <p><b>The price.</b> Memory: <code>2 &times; L &times; H<sub>kv</sub> &times; d<sub>head</sub> &times; bytes &times; tokens</code> (the 2 is K and V). It grows linearly with sequence length, which is why long contexts and many concurrent users are often limited by memory, and why designs with fewer KV heads (grouped-query or multi-query attention) shrink it.</p>
+      <p class="note"><b>Simplifications.</b> Toy cost model: every position costs one unit regardless of model size; prompt length is 0; batching, prefill chunking and paged caches are ignored. Memory figures use the formula exactly, but L and H<sub>kv</sub> are free sliders, not a specific model. Without a cache the K/V tensors exist transiently inside each step; &ldquo;extra memory held&rdquo; counts only what is kept between steps.</p>
+      <p class="note">Vault page: [[kv-cache]] (a stub with no sources yet). This explanation is general knowledge, not sourced, and this playground is a teaching aid, not evidence.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var D_HEAD = 128, BYTES = 2; // fp16
+  var GPU_GIB = 80;
+
+  function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function fmt(x) { return Math.round(x).toLocaleString("en-US"); }
+  function fmtBytes(b) {
+    var u = ["B", "KiB", "MiB", "GiB", "TiB"], i = 0;
+    while (b >= 1024 && i < u.length - 1) { b /= 1024; i++; }
+    return (i === 0 ? b.toFixed(0) : b.toFixed(b < 10 ? 2 : 1)) + " " + u[i];
+  }
+  function setupCanvas(c) {
+    var dpr = window.devicePixelRatio || 1;
+    var w = c.clientWidth, h = parseInt(c.getAttribute("height"), 10);
+    c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+    var ctx = c.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx: ctx, w: w, h: h };
+  }
+
+  // ---- math ----
+  function posNo(N) { return N * (N + 1) / 2; }          // sum_{t=1..N} t
+  function posYes(N) { return N; }                       // 1 per step
+  function qkNo(N) { return N * (N + 1) * (N + 2) / 6; } // sum_t t(t+1)/2 (full causal prefix recomputed)
+  function qkYes(N) { return N * (N + 1) / 2; }          // sum_t t (one new query row)
+  function cacheBytes(N, L, H) { return 2 * L * H * D_HEAD * BYTES * N; }
+
+  function drawStrip(N, useCache) {
+    var s = setupCanvas($("strip")), ctx = s.ctx;
+    ctx.clearRect(0, 0, s.w, s.h);
+    var pad = 4, W = s.w - 2 * pad, cell = W / N, gap = cell > 4 ? 1 : 0;
+    for (var i = 0; i < N; i++) {
+      var last = i === N - 1;
+      ctx.fillStyle = last ? css("--new") : (useCache ? css("--cache") : css("--nocache"));
+      ctx.fillRect(pad + i * cell, 14, Math.max(cell - gap, 0.6), 36);
+    }
+    ctx.fillStyle = css("--muted"); ctx.font = "12px system-ui, sans-serif";
+    ctx.textBaseline = "top";
+    ctx.textAlign = "left"; ctx.fillText("position 1", pad, 0);
+    ctx.textAlign = "right"; ctx.fillText("position " + N, s.w - pad, 0);
+    ctx.textAlign = "left";
+    var done = useCache ? 1 : N;
+    ctx.fillText(fmt(done) + " of " + fmt(N) + " positions computed this step", pad, 52);
+  }
+
+  function drawChart(N) {
+    var s = setupCanvas($("chart")), ctx = s.ctx;
+    ctx.clearRect(0, 0, s.w, s.h);
+    var L = 46, R = 10, T = 10, B = 24, pw = s.w - L - R, ph = s.h - T - B;
+    var top = Math.max(posNo(N), 10), maxExp = Math.ceil(Math.log10(top));
+    function X(t) { return L + (N === 1 ? 0 : (t - 1) / (N - 1)) * pw; }
+    function Y(v) { return T + ph - (Math.log10(Math.max(v, 1)) / maxExp) * ph; }
+    ctx.font = "11px system-ui, sans-serif"; ctx.fillStyle = css("--muted");
+    ctx.strokeStyle = css("--line"); ctx.lineWidth = 1;
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    for (var e = 0; e <= maxExp; e++) {
+      var y = Y(Math.pow(10, e));
+      ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(L + pw, y); ctx.stroke();
+      ctx.fillText(e === 0 ? "1" : "10^" + e, L - 6, y);
+    }
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ctx.fillText("step 1", L, T + ph + 6);
+    ctx.fillText("step " + N, L + pw, T + ph + 6);
+    function curve(fn, color) {
+      ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.beginPath();
+      var steps = Math.min(N, 200);
+      for (var k = 0; k < steps; k++) {
+        var t = steps === 1 ? 1 : 1 + Math.round(k * (N - 1) / (steps - 1));
+        var px = X(t), py = Y(fn(t));
+        if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(X(N), Y(fn(N)), 4, 0, 6.283); ctx.fill();
+    }
+    curve(posNo, css("--nocache"));
+    curve(posYes, css("--cache"));
+  }
+
+  function update() {
+    var N = +$("n").value, Ly = +$("layers").value, H = +$("heads").value;
+    var useCache = $("useCache").checked;
+    $("nOut").textContent = N; $("layersOut").textContent = Ly; $("headsOut").textContent = H;
+
+    $("posNo").textContent = fmt(posNo(N)); $("posYes").textContent = fmt(posYes(N));
+    $("qkNo").textContent = fmt(qkNo(N)); $("qkYes").textContent = fmt(qkYes(N));
+    var mem = cacheBytes(N, Ly, H);
+    $("memNo").textContent = "0 B"; $("memYes").textContent = fmtBytes(mem);
+    ["rowPos", "rowQK", "rowMem"].forEach(function (id) {
+      $(id).style.fontWeight = "400";
+    });
+    var cells = document.querySelectorAll("#rowPos td, #rowQK td, #rowMem td");
+    for (var i = 0; i < cells.length; i++) {
+      var col = i % 3; cells[i].style.opacity = (col === 0 || (col === 2) === useCache) ? "1" : "0.5";
+    }
+    var perTok = cacheBytes(1, Ly, H);
+    var pct = Math.min(100, mem / (GPU_GIB * Math.pow(1024, 3)) * 100);
+    $("memBar").style.width = pct + "%";
+    $("memNote").textContent = fmtBytes(perTok) + " per token; " + fmtBytes(mem) +
+      " is " + (pct < 0.1 ? "<0.1" : pct.toFixed(1)) + "% of an " + GPU_GIB + " GiB GPU, for one sequence.";
+
+    var ratio = posNo(N) / posYes(N);
+    $("answer").innerHTML = "With N = <b>" + N + "</b>, no cache pushes <b>" + fmt(posNo(N)) +
+      "</b> token-positions through the network versus <b>" + fmt(posYes(N)) + "</b> with a cache: <b>" +
+      ratio.toFixed(1) + "&times;</b> more. The ratio is (N+1)/2, so it grows with length. At N = 512 that is 256.5&times;, which is the &ldquo;about 250&times;&rdquo; option.";
+
+    drawStrip(N, useCache); drawChart(N);
+  }
+
+  ["n", "layers", "heads", "useCache"].forEach(function (id) {
+    $(id).addEventListener("input", update);
+    $(id).addEventListener("change", update);
+  });
+  $("revealBtn").addEventListener("click", function () {
+    var r = $("reveal"); r.hidden = !r.hidden;
+    this.textContent = r.hidden ? "Reveal the explanation" : "Hide the explanation";
+  });
+  window.addEventListener("resize", update);
+  if (window.matchMedia) {
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    if (mq.addEventListener) mq.addEventListener("change", update);
+  }
+  update();
+})();
+</script>
+</body>
+</html>

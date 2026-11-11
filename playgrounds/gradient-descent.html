@@ -1,0 +1,52 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gradient descent playground</title>
+<style>
+:root{--bg:#fafaf8;--ink:#1d2127;--muted:#6b7280;--line:#e4e4df;--panel:#fff;--accent:#3b5bdb;--ok:#2f9e6b;--bad:#c92a2a;--c1:#c9d3f5}
+@media(prefers-color-scheme:dark){:root{--bg:#14161a;--ink:#e6e8ec;--muted:#98a0ad;--line:#2b2f37;--panel:#1b1e24;--accent:#7c93ff;--ok:#4cc38a;--bad:#ff6b6b;--c1:#34406e}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,sans-serif;padding:14px}
+h1{font-size:19px;margin:0 0 4px}.sub{color:var(--muted);margin:0 0 12px;font-size:13px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(240px,1fr);gap:12px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+canvas{width:100%;height:auto;border-radius:10px;background:var(--panel);border:1px solid var(--line);cursor:crosshair;touch-action:none}
+label{display:block;font-size:13px;margin-top:10px}label b{font-variant-numeric:tabular-nums;color:var(--accent)}
+input[type=range]{width:100%}button{background:var(--accent);color:var(--bg);border:0;border-radius:8px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer;margin:6px 6px 0 0}button.g{background:var(--line);color:var(--ink)}
+.opt{display:block;width:100%;text-align:left;background:var(--bg);color:var(--ink);border:1px solid var(--line);margin:6px 0}.opt.sel{border-color:var(--accent)}
+.stat{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;margin-top:8px;font-variant-numeric:tabular-nums}.pill{padding:2px 9px;border-radius:99px;background:var(--line);font-size:12px}.pill.ok{color:var(--ok)}.pill.bad{color:var(--bad)}
+#reveal{display:none;border-left:3px solid var(--accent);padding-left:10px;margin-top:10px;font-size:14px}
+</style></head><body>
+<h1>Gradient descent playground</h1><p class="sub">Loss L(x, y) = &frac12;(x&sup2; + k&middot;y&sup2;). Click the plot to choose a start point, then step or run. A teaching aid, not a source.</p>
+<div class="card" id="predict"><b>Predict first.</b> The valley is steep in y and shallow in x (k = 8). You double the learning rate again and again. What happens to plain gradient descent?
+<button class="opt" data-a="a">It converges faster every time</button><button class="opt" data-a="b">It speeds up, then suddenly starts oscillating and blowing up in y</button><button class="opt" data-a="c">Nothing changes: the learning rate only affects the final loss</button>
+<div id="reveal"></div></div>
+<div class="grid"><div><canvas id="cv" width="640" height="420"></canvas></div>
+<div class="card"><label>Learning rate &alpha; <b id="lrv"></b><input id="lr" type="range" min="0.005" max="0.6" step="0.005" value="0.1"></label>
+<label>Momentum &beta; <b id="bv"></b><input id="b" type="range" min="0" max="0.95" step="0.01" value="0"></label>
+<label>Steepness ratio k <b id="kv"></b><input id="k" type="range" min="1" max="20" step="1" value="8"></label>
+<div><button id="step">Step</button><button id="run">Run</button><button id="reset" class="g">Reset</button></div>
+<div class="stat"><span>step <b id="n">0</b></span><span>loss <b id="L">-</b></span><span id="state" class="pill">ready</span></div>
+<div class="stat" style="display:block"><div>Stability limit for this k and &beta;: &alpha; &lt; <b id="lim"></b></div><div class="sub" style="margin:4px 0 0">On this quadratic, heavy-ball momentum converges when &alpha;&middot;k &lt; 2(1+&beta;), so the limit is 2(1+&beta;)/k.</div></div></div></div>
+<script>
+const $=id=>document.getElementById(id),cv=$("cv"),g=cv.getContext("2d");
+let P={x:-3.2,y:1.4},V={x:0,y:0},n=0,path=[],timer=null,start={x:-3.2,y:1.4};
+const W=cv.width,H=cv.height,X0=-4,X1=4,Y0=-3,Y1=3,sx=x=>(x-X0)/(X1-X0)*W,sy=y=>H-(y-Y0)/(Y1-Y0)*H;
+const get=()=>({lr:+$("lr").value,b:+$("b").value,k:+$("k").value});
+const loss=(x,y,k)=>0.5*(x*x+k*y*y);
+function lab(){const{lr,b,k}=get();$("lrv").textContent=lr.toFixed(3);$("bv").textContent=b.toFixed(2);$("kv").textContent=k;$("lim").textContent=(2*(1+b)/k).toFixed(3);}
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n)}
+function draw(){const{lr,b,k}=get();g.clearRect(0,0,W,H);g.lineWidth=1;
+ for(let c=0.25;c<14;c*=1.7){g.strokeStyle=css("--c1");g.beginPath();g.ellipse(sx(0),sy(0),Math.sqrt(2*c)/(X1-X0)*W,Math.sqrt(2*c/k)/(Y1-Y0)*H,0,0,7);g.stroke();}
+ g.fillStyle=css("--muted");g.font="12px system-ui";g.fillText("x (shallow)",W-80,H-8);g.fillText("y (steep)",8,14);
+ g.strokeStyle=css("--accent");g.lineWidth=2;g.beginPath();path.forEach((p,i)=>{const a=sx(p.x),c=sy(p.y);i?g.lineTo(a,c):g.moveTo(a,c)});g.stroke();
+ g.fillStyle=css("--bad");g.beginPath();g.arc(sx(0),sy(0),5,0,7);g.fill();
+ g.fillStyle=css("--accent");path.forEach((p,i)=>{g.beginPath();g.arc(sx(p.x),sy(p.y),i==path.length-1?6:2.5,0,7);g.fill()});}
+function status(){const{k}=get(),L=loss(P.x,P.y,k);$("n").textContent=n;$("L").textContent=isFinite(L)?(L>1e6?"&gt;1e6".replace("&gt;",">"):L.toFixed(L<0.01?5:3)):"inf";
+ const s=$("state");if(!isFinite(L)||L>1e6){s.textContent="diverged";s.className="pill bad";stop()}else if(L<1e-4){s.textContent="converged";s.className="pill ok";stop()}else{s.textContent=n?"descending":"ready";s.className="pill"}}
+function step(){const{lr,b,k}=get(),gx=P.x,gy=k*P.y;V.x=b*V.x-lr*gx;V.y=b*V.y-lr*gy;P={x:P.x+V.x,y:P.y+V.y};n++;path.push({...P});if(path.length>400)path.shift();draw();status()}
+function stop(){clearInterval(timer);timer=null;$("run").textContent="Run"}
+function reset(){stop();P={...start};V={x:0,y:0};n=0;path=[{...P}];draw();status();lab()}
+$("step").onclick=step;$("run").onclick=()=>{if(timer)return stop();$("run").textContent="Pause";timer=setInterval(()=>{if(n>600)return stop();step()},60)};$("reset").onclick=reset;
+["lr","b","k"].forEach(i=>$(i).oninput=()=>{lab();if(i=="k"){draw()}});
+cv.onpointerdown=e=>{const r=cv.getBoundingClientRect();start={x:X0+(e.clientX-r.left)/r.width*(X1-X0),y:Y1-(e.clientY-r.top)/r.height*(Y1-Y0)};reset()};
+document.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{document.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel"));o.classList.add("sel");
+ const r=$("reveal");r.style.display="block";r.innerHTML=(o.dataset.a=="b"?"<b>Right.</b> ":"<b>Not quite.</b> ")+"Past a point a bigger step overshoots the steep direction: each step lands farther up the other wall, so y flips sign and grows. For this quadratic the limit is &alpha; &lt; 2/k. Try &alpha; = 0.2, then 0.3 with k = 8, and watch the trail. Then add momentum.";});
+window.matchMedia("(prefers-color-scheme: dark)").onchange=draw;reset();
+</script></body></html>
