@@ -8,11 +8,26 @@ _Derived by `./kb build`. Do not edit; edit the pages._
 
 ## Concepts
 
+- [[abi-stability-in-c-libraries]] — Keeping a compiled library's binary interface unchanged so programs linked against one version keep working with others; achieved by opaque handles, extensible accessors, sized structs and enforced checks. (reviewed, medium) · programming
 - [[adam-and-modern-optimizers]] — Variants of gradient descent that adapt step sizes using the history of gradients. (stub, low) · ai
+- [[agent-guardrails-and-defense-in-depth]] — Constraints on an agent's tool calls, credentials and environment, stacked in layers (input, output, tool, sandbox, human approval, monitoring) because no single layer, including the model, can be relied on. (reviewed, medium) · ai
+- [[agent-harness]] — The software around an LLM that supplies the system prompt, tools and loop, turning a model into an agent. (reviewed, low) · ai
+- [[agent-instruction-files]] — Text loaded into every agent session, best kept short and limited to what the agent cannot work out from the code; hard rules belong in hooks. (reviewed, low) · ai
+- [[agentic-application-security-risks-owasp-agentic-top-10]] — OWASP's ten highest-impact risks for agent systems, from goal hijack and tool misuse to memory poisoning and rogue agents, with the principles of least agency and observability. (reviewed, medium) · ai
+- [[agentic-engineering]] — Developing software with coding agents while keeping professional quality: specifying, verifying and iterating, not just prompting. (reviewed, medium) · ai
+- [[agentic-workflow-patterns]] — Reusable designs: prompt chaining, routing, parallelization, orchestrator-workers and evaluator-optimizer (reflection). (reviewed, low) · ai
 - [[ai-alignment]] — Making a system's behaviour match its designers' intended goals and values. (stub, low) · ai
+- [[automated-quality-gates-for-agent-written-code]] — Machine-checked constraints (tests, complexity-times-coverage metrics such as CRAP, mutation testing, agent-run verification with evidence) used to trust agent-written code without reading every line. (reviewed, low) · programming
 - [[backpropagation]] — Efficiently computing the gradient of the loss for every parameter using the chain rule. (stub, low) · ai
 - [[benchmark-contamination]] — Test data leaking into training data and inflating scores. (stub, low) · ai
+- [[claude-code-customization-layers]] — The ways to shape Claude Code: CLAUDE.md and memory files, settings and permissions, skills, subagents, MCP servers, hooks, plugins and mods, with a rule for which to choose. (reviewed, low) · ai
+- [[compute-optimal-training-chinchilla]] — Choosing model size and token count to minimise loss for a fixed compute budget; Chinchilla says scale both at about equal rates. (reviewed, low) · ai
+- [[confidence-calibration]] — A model is calibrated when the confidence it reports matches how often it is right, so low-confidence answers are the likely mistakes and can be routed to review. (reviewed, low) · ai
+- [[confidence-gated-hybrid-judge-cheap-model-then-frontier]] — Run a cheap confidence-scoring model on every item and escalate only items whose score falls in an uncertain band to an expensive frontier model, trading a little accuracy for much lower cost. (reviewed, low) · ai
+- [[context-window-and-compaction]] — What fills an agent's context (instructions, tools, messages, files, results) and how cost, speed and accuracy depend on it; compaction summarises when it fills. (draft, low) · ai
 - [[convolutional-neural-networks]] — Networks that share small filters across positions, well suited to images. (stub, low) · ai
+- [[data-constrained-scaling]] — How scaling laws change when unique training data is limited and must be repeated across epochs. (reviewed, low) · ai
+- [[decision-models-confidence-score-models]] — A newer class of language models that return a 0-1 confidence that a stated condition is true, much faster and cheaper than frontier models but less accurate on hard cases. (reviewed, low) · ai
 - [[decoding-and-sampling]] — Choosing the next token from the model's distribution: greedy, temperature, top-k, top-p. (stub, low) · ai
 - [[derivatives-and-gradients]] — How a function changes with its inputs; the basis for training by gradient descent. (stub, low) · science
 - [[diffusion-models]] — Generating data by learning to reverse a gradual noising process. (stub, low) · ai
@@ -20,41 +35,195 @@ _Derived by `./kb build`. Do not edit; edit the pages._
 - [[embeddings]] — Dense vectors representing discrete items such as words, so that similar items lie close together. (stub, low) · ai
 - [[entropy-and-cross-entropy]] — Measures of uncertainty and of the gap between two distributions; cross-entropy is the standard loss for classification and language models. (stub, low) · science
 - [[evaluating-llms]] — Measuring model quality with benchmarks, human judgment and model-based graders, and the pitfalls of each. (stub, low) · ai
+- [[git-worktrees-for-parallel-agents]] — Giving each agent its own working copy (a Git worktree) so parallel agents do not overwrite each other, with the catch that merge conflicts can still arise. (reviewed, low) · programming
+- [[giving-coding-agents-sensors-and-live-hot-swap-channels]] — Connect a coding agent to real-world sensors (e.g. microphones) and a channel to push new code to the sensing devices live, so it can observe, experiment and iterate unattended. (reviewed, low) · ai
 - [[gradient-descent]] — Iteratively adjusting parameters in the direction that reduces the loss. (stub, low) · ai
 - [[hallucination]] — A model producing fluent but false or unsupported statements. (stub, low) · ai
+- [[identity-resolution-and-over-merging]] — Identity resolution maps data records to the real people they describe; over-merging, where one identity mixes several people, is its most common and damaging failure and is hard to measure without ground truth. (reviewed, low) · business
 - [[in-context-learning]] — A model adapting to a task from examples in its prompt without any weight updates. (stub, low) · ai
 - [[kv-cache]] — Caching attention keys and values so earlier tokens are not recomputed during generation. (stub, low) · ai
 - [[language-modeling]] — Training a model to predict the next token; the pretraining objective of most LLMs. (stub, low) · ai
+- [[libghostty]] — A portable, MIT-licensed C library for terminal emulation extracted from Ghostty; 1.0 (2026-11-06) stabilised the library and its C ABI. (reviewed, medium) · programming
 - [[linear-algebra-for-ml]] — Vectors, matrices and their operations: the language in which neural networks are written. (stub, low) · science
-- [[llm-agents]] — Systems where a model loops over planning, tool calls and observations to complete tasks. (stub, low) · ai
+- [[llm-agents]] — Systems where an LLM uses tools in a loop to pursue a goal, from fixed workflows to autonomous coding agents and swarms. (draft, medium) · ai
+- [[llm-as-a-lossy-compressed-internet]] — Karpathy's mental model: a chat is a token stream; the model is a lossy, probabilistic zip file of internet text (pre-training) with an assistant persona (post-training) and a knowledge cut-off, and no tools by default. (reviewed, medium) · ai
+- [[long-horizon-agent-state-management]] — How to keep an agent oriented across many context windows: tests in a structured file, free-text progress notes, git as a checkpoint log, and a deliberate choice between fresh start and compaction. (reviewed, medium) · ai
 - [[loss-functions]] — A number measuring how wrong a model's predictions are; training minimises it. (stub, low) · ai
 - [[low-rank-adaptation-lora]] — Adapting a model by training small low-rank update matrices instead of all its weights. (stub, low) · ai
 - [[mechanistic-interpretability]] — Reverse-engineering what the internal components of a neural network compute. (stub, low) · ai
 - [[mixture-of-experts]] — Routing each token to a few specialist sub-networks so capacity grows without proportional compute. (stub, low) · ai
+- [[model-context-protocol-mcp]] — An open protocol for connecting AI models to external tools and data through standalone servers; it sits above function calling, adds discoverability and reuse, and brings context-cost and security surfaces. (reviewed, low) · ai
+- [[multi-agent-failure-modes]] — Documented ways agent groups fail: conformity, weak epistemic vigilance, collusion and escalation under conflicting goals. (reviewed, low) · ai
+- [[multi-agent-orchestration]] — Structures for using several agents: fan-out, effort scaling, builder-reviewer-verifier pairs, manager threads and swarms. (reviewed, low) · ai
+- [[multi-head-attention]] — Running several attention functions in parallel on different learned projections, then concatenating the results. (reviewed, medium) · ai
 - [[neural-networks]] — Layered functions of weighted sums and non-linearities, trained to fit data. (stub, low) · ai
 - [[overfitting-and-generalization]] — A model fitting its training data so closely that it fails on new data. (stub, low) · ai
-- [[positional-encoding]] — Injecting token order into a model that otherwise treats its input as an unordered set. (stub, low) · ai
+- [[personal-agents]] — Agents that keep your preferences and history in plain-text memory files and, in the packaged consumer version, act proactively; includes the do-it-yourself setup and its trade-offs. (reviewed, low) · ai
+- [[positional-encoding]] — Vectors added to token embeddings so a model with no recurrence or convolution can use word order; the original Transformer used fixed sinusoids. (draft, medium) · ai
 - [[probability-and-statistics-basics]] — Describing uncertainty with distributions, expectation, conditional probability and Bayes' rule. (stub, low) · science
-- [[prompt-engineering]] — Designing model inputs, including instructions and examples, to steer outputs. (stub, low) · ai
-- [[prompt-injection]] — Untrusted text in a model's context hijacking its instructions. (stub, low) · ai
+- [[probe-plan-teach-ai-tutoring-loop]] — A pattern for AI-assisted learning: first measure what the learner knows with quizzes, then plan a path as a visible graph, then teach one reasoning step at a time with periodic checks. (reviewed, low) · learning
+- [[prompt-engineering]] — Designing model inputs, including clear instructions, context, examples and structure, to steer outputs; current guidance from Anthropic's docs for Claude models, which is vendor-specific and changes with each model. (draft, low) · ai
+- [[prompt-injection]] — Untrusted text in a model's context hijacking its instructions; in agents it becomes goal hijack, because instructions and data share one natural-language channel. (draft, low) · ai
 - [[quantization]] — Storing weights in fewer bits to cut memory use and speed up inference. (stub, low) · ai
+- [[reasoning-models-and-long-chain-of-thought]] — Models trained, mostly with reinforcement learning on checkable tasks, to write a long chain of thought before answering; they help most on hard maths and code and cost more time and tokens. (reviewed, medium) · ai
 - [[regularization]] — Techniques that constrain a model to reduce overfitting, such as weight decay and dropout. (stub, low) · ai
 - [[reinforcement-learning-basics]] — Learning to act by maximising cumulative reward through interaction with an environment. (stub, low) · ai
 - [[reinforcement-learning-from-human-feedback]] — Using human preference judgments to train a reward signal and tune model behaviour. (stub, low) · ai
+- [[reinforcement-learning-with-verifiable-rewards]] — Training a model with reinforcement learning where the reward is computed by a rule or checker (a correct answer, passing code) rather than by a learned reward model; DeepSeek used GRPO for this. (reviewed, medium) · ai
 - [[retrieval-augmented-generation]] — Fetching relevant documents at query time and giving them to a model as context. (stub, low) · ai
-- [[scaling-laws]] — Empirical relationships between model size, data, compute and loss. (stub, low) · ai
-- [[self-attention]] — A mechanism letting each position in a sequence weigh information from all other positions. (stub, low) · ai
+- [[scaling-laws]] — Empirical power-law relationships between loss and model size, data and compute, used to decide how to allocate training compute. (draft, low) · ai
+- [[self-attention]] — Each position of a sequence forms a weighted sum of all positions' value vectors, with weights from a softmax over scaled query-key dot products. (draft, medium) · ai
+- [[self-verification-loop]] — Giving an agent a pass/fail check, with evidence, so it can test its own work before a human reviews it. (reviewed, low) · ai
+- [[single-agent-reasoning-patterns]] — Four ways to structure one LLM agent's reasoning: ReAct (step by step), Plan-and-Execute (plan first), ReWOO (plan with placeholders, run tools in parallel) and Reflexion (retry with a self-critique); chosen by which failure mode you can tolerate. (reviewed, medium) · ai
+- [[sleeper-agents-backdoored-models]] — Models trained to behave normally until a trigger appears and then act unsafely; Anthropic's study found such backdoors survive standard safety training. (reviewed, low) · ai
+- [[software-3-0]] — Karpathy's framing: after explicit code and learned weights, programming becomes prompting the context window of an LLM. (reviewed, low) · ai
 - [[supervised-fine-tuning]] — Continuing training on curated examples to specialise or instruction-tune a pretrained model. (stub, low) · ai
 - [[supervised-learning]] — Learning a mapping from inputs to labels using examples. (stub, low) · ai
+- [[the-agent-loop-think-act-observe]] — The core mechanism of an agent: the LLM reasons about the next step, calls a tool, reads the result and repeats until it can answer; the three parts are the model, the tools and the memory/state. (reviewed, medium) · ai
+- [[the-lethal-trifecta-and-the-agents-rule-of-two]] — Prompt injection becomes a data breach when an agent has private data, untrusted content and an external communication channel at once; Meta's Rule of Two says hold at most two per session. (reviewed, medium) · ai
 - [[tokenization]] — Splitting text into sub-word units that a language model reads and predicts. (stub, low) · ai
-- [[tool-use-and-function-calling]] — A model emitting structured calls to external functions and using their results. (stub, low) · ai
+- [[tool-use-and-function-calling]] — A model emitting structured tool calls that the harness executes, with results fed back to the model. (draft, medium) · ai
 - [[train-validation-and-test-splits]] — Holding out data to estimate how a model performs on examples it has not seen. (stub, low) · ai
-- [[transformer-architecture]] — Stacked blocks of attention and feed-forward layers with residual connections; the basis of modern language models. (stub, low) · ai
+- [[transformer-architecture]] — An encoder-decoder network built from stacked layers of multi-head attention and position-wise feed-forward networks, with residual connections and layer normalization. (draft, medium) · ai
 - [[vector-search]] — Finding items whose embeddings are nearest to a query embedding. (stub, low) · ai
+- [[weight-space-programming]] — Using a general-purpose LLM, not an optimizer, to read a neural network's weights, explain what they do, and write or edit them from a natural-language goal; early results from one research blog. (reviewed, low) · ai
+- [[why-agents-fail-in-production]] — Agents mostly fail from the engineering around the model, not the model: poor retrieval context, brittle connectors (schema drift, expired credentials, polling) and per-step errors that compound without checkpoints. (reviewed, medium) · ai
+- [[workflows-versus-agents]] — Anthropic's distinction: workflows follow predefined code paths; agents let the LLM direct its own process and tool use. (reviewed, medium) · ai
+
+## Claims
+
+- [[claim-coordinating-swarms-found-more-vulnerabilities]] — 266 versus 21 vulnerabilities for one model, but about half outside the core directories and little overlap. (reviewed, low) · ai
+- [[a-jev-then-opus-hybrid-matches-opus-accuracy-at-over-4x-lower-cost]] — Hightouch reports that escalating only uncertain Jev cases to Opus gives near-Opus accuracy for about a quarter of the cost on an easier test, but the cost advantage shrinks to under 2x on a harder test. (reviewed, low) · ai
+- [[claim-agents-are-llms-using-tools-in-a-loop]] — Both Willison and Anthropic describe an agent as tools run in a loop toward a goal. (reviewed, medium) · ai
+- [[claim-agents-with-similar-context-decide-alike]] — Anthropic's experiments show many agents making the same choices, including bad ones. (reviewed, low) · ai
+- [[agents-in-training-broke-out-of-sandboxes-as-reported-by-willison]] — Willison reports that OpenAI agents in training broke out of a sandbox and attacked Hugging Face, that Anthropic found similar evidence in its logs, and that later incidents were traced to training; the sources behind these reports were not read. (reviewed, low) · ai
+- [[claim-agents-need-a-pass-fail-check]] — Giving an agent something to run that returns pass or fail lets it close the loop itself. (reviewed, medium) · ai
+- [[an-llm-editing-0-016-of-weights-raised-qwen3-5-0-8b-math-500-from-7-9]] — Researchers report that GPT-6 Astra, by subtracting one direction from MLP outputs, raised a small model's MATH-500 from 7.9% to 48.1% by stopping reasoning loops, but could not improve a non-looping model. (reviewed, low) · ai
+- [[backdoor-behaviour-can-survive-supervised-rl-and-adversarial-safety-tr]] — Anthropic reports that deliberately trained backdoors were not removed by SFT, RL or adversarial training, and that adversarial training can make models hide the trigger better. (reviewed, low) · ai
+- [[calibration-not-out-of-box-accuracy-determines-hybrid-judge-performanc]] — Hightouch argues that the cheap model with better-calibrated confidence (Jev) makes the better first stage of a hybrid even though Luna is more accurate alone. (reviewed, low) · ai
+- [[claude-code-can-be-given-ears-via-browser-microphones-and-code-it-can]] — Although Claude has no native audio input, Willison claims a coding agent can "hear" by running code over audio captured by remote microphones; supported by one self-reported working example. (reviewed, low) · ai
+- [[claude-code-for-vs-code-2-1-312-and-2-1-313-on-the-cursor-marketplace]] — Phorion reports that two versions of the official Claude Code extension on the Cursor Marketplace contained a persistent SSH backdoor and that Cursor removed them; this is one vendor's analysis. (reviewed, low) · programming
+- [[claim-chinchilla-equal-scaling-of-model-and-tokens]] — Chinchilla's finding that, for a fixed compute budget, parameters and tokens should grow together. (reviewed, low) · ai
+- [[claim-contested-kaplan-model-grows-faster-than-data]] — Kaplan et al.'s conclusion (N_opt about C^0.73): scale models faster than data and stop before convergence. (reviewed, low) · ai
+- [[generative-ai-providers-are-unprofitable-and-costs-are-not-falling]] — Ed Zitron argued in September 2025 that every generative AI company is losing money and inference costs are rising; later 2026 accounts describe large spending and product-market fit but no profit data. (reviewed, low) · business
+- [[given-a-clear-goal-unambiguous-constraints-and-tools-frontier-models-s]] — Willison describes 'Fable class' models as able to build almost anything you can define with a clear goal, unambiguous constraints and tool access, which makes definition skill the scarce part. (reviewed, low) · ai
+- [[gpus-realize-under-30-of-memory-bandwidth-in-inference-while-positron]] — Positron says most accelerators achieve under 30% of theoretical memory bandwidth on real inference while its Asimov design realises over 90%; these are vendor claims, with Asimov performance from simulation. (reviewed, low) · ai
+- [[claim-hooks-enforce-rules-deterministically]] — Claude Code docs distinguish model-decided instructions from harness-executed ones. (reviewed, medium) · ai
+- [[in-coding-agents-compilers-and-tests-catch-most-hallucinated-code]] — Ptacek argues hallucination is largely a solved problem for coding agents because lint, compile and test failures are fed back to the model; this is an opinion without measurements. (reviewed, low) · programming
+- [[klarna-scaled-back-its-customer-service-agent-and-rehired-humans]] — A newsletter says Klarna's agent handled two-thirds of chats and cut resolution time from 11 minutes to under 2, then Klarna had to rehire human agents because complex cases got templated answers. (reviewed, low) · ai, business
+- [[libghostty-is-embedded-widely-in-production]] — The author says libghostty runs in production for millions of people across hundreds of products, including JetBrains IDE terminals; evidence is mostly links and self-reported numbers. (reviewed, low) · programming
+- [[mcp-standardises-tool-discovery-above-function-calling]] — MCP does not replace function calling: the model still calls tools through its provider's tool-calling format, while MCP standardises how tools are hosted, discovered and described across models. (reviewed, medium) · ai
+- [[mcp-tool-poisoning-succeeded-84-percent-with-auto-approval]] — Hidden instructions in MCP tool metadata reportedly succeeded 84% of the time in controlled tests where agents auto-approved tool use; reported second-hand and not production data. (reviewed, low) · ai
+- [[claim-more-capable-models-may-misreport-success]] — A creator cites a system card claim that a stronger model lied or colluded in tests; the card is not in the wiki. (reviewed, low) · ai
+- [[neural-reward-models-invite-reward-hacking-in-large-scale-rl]] — DeepSeek reports that learned reward models, outcome or process, were susceptible to reward hacking in large-scale RL, so it used rule-based rewards for reasoning. (reviewed, low) · ai
+- [[per-step-error-compounds-across-an-agent-workflow]] — If each step succeeds independently with probability p, an n-step workflow succeeds with p^n; at 85% per step that is about 44% over five steps and 20% over ten. (reviewed, medium) · ai
+- [[reinforcement-learning-on-verifiable-rewards-alone-can-elicit-reasonin]] — DeepSeek reports that RL with only answer-correctness and format rewards, and no SFT stage, produced strong long-chain reasoning in R1-Zero; independent replication is not shown here. (reviewed, medium) · ai
+- [[routing-work-to-cheaper-subagent-models-cuts-cost-by-about-60]] — Moksa claims that sending planning to a large model, coding to a mid-size one and search to a small one cuts token cost about 60%; the figure comes from the author's own illustrative example. (reviewed, low) · ai
+- [[claim-scaling-law-fits-are-procedure-sensitive]] — Parameter counting, rounding, loss averaging and fit range can change the fitted exponents and extrapolations. (reviewed, low) · ai
+- [[scion-cut-code-checkout-from-minutes-to-seconds]] — Anthropic reportedly says its server-side Scion version control cut CI and agent code checkout from minutes to seconds and saved about 25% of CI CPU; secondary sources also disagree on repository size. (reviewed, low) · programming
+- [[claim-self-attention-has-constant-sequential-depth]] — Unlike recurrent layers, which need O(n) sequential operations, a self-attention layer relates any two positions in O(1) steps. (reviewed, medium) · ai
+- [[claim-fixing-findings-with-the-same-builder-is-cheaper]] — Amjad reports a replay of about 10 PRs favouring the same builder, 38% cheaper. (reviewed, low) · ai
+- [[claim-subagent-per-ticket-spec-decomposition-helps]] — Contested: said to help older models but be unnecessary or harmful for newer ones. (reviewed, low) · ai
+- [[claim-start-simple-before-agentic-complexity]] — Anthropic and Schmid both advise simple solutions first. (reviewed, medium) · ai
+- [[strong-automated-verification-can-replace-human-review-of-agent-writte]] — Uncle Bob, pstack's author and StrongDM say machine-checked constraints can stand in for reading agent code; Ptacek and others say responsibility still requires reading it. (reviewed, low) · programming
+- [[system-prompts-cannot-stop-an-agent-from-calling-a-tool]] — A prompt rule such as 'never delete production data' is a preference the model can override; reliable enforcement has to live in scoped credentials, sandboxes and approval gates below the model. (reviewed, low) · ai
+- [[the-choice-of-tool-changes-agent-context-use-several-fold-for-the-same]] — In one sponsored test the same price-lookup job used roughly 36,000 to 155,000 context tokens depending on the scraping tool; the video's numbers are inconsistent and one-off. (reviewed, low) · ai
+- [[the-r1-zero-aha-moment-shows-reflection-emerging-from-rl]] — The DeepSeek authors present a sudden rise in words like 'wait' as an emergent self-reflection moment; their own bibliography lists a paper arguing there may be no such aha moment. (reviewed, low) · ai
+- [[claim-transformer-sota-translation-at-lower-cost-2017]] — The authors report 28.4 BLEU on WMT14 EN-DE and 41.8 on EN-FR with a fraction of prior training cost. (reviewed, low) · ai
+- [[claim-vibe-coding-versus-agentic-engineering]] — Both Willison and Karpathy separate unreviewed prototype coding from quality-preserving agent-assisted engineering. (reviewed, medium) · ai
 
 ## Open questions
 
+- [[are-llm-economics-sustainable-as-agents-and-reasoning-raise-token-use]] — Reasoning and agents use many more tokens; sources disagree on whether providers and their customers can earn profit at these costs. (reviewed, low) · business
+- [[can-automated-verification-replace-human-code-review-for-agent-written]] — Practitioners disagree on whether tests, metrics and agent-run evidence can substitute for reading agent-written code; no controlled comparison is in the vault. (reviewed, low) · programming
 - [[can-hallucination-be-eliminated-or-only-reduced]] — Whether any training or retrieval approach can bring fabricated statements to zero, or only lower their rate. (stub, low) · ai
+- [[can-llms-add-capabilities-by-editing-weights-or-only-remove-obstacles]] — The weight-space programming post fixed a looping failure but could not improve a non-looping model; whether weight editing can add ability is open. (reviewed, low) · ai
 - [[do-language-models-build-internal-world-models]] — Whether next-token prediction leads models to represent the underlying structure of the world, or mainly surface statistics. (stub, low) · ai
 - [[do-scaling-laws-keep-holding-as-models-and-data-grow]] — Whether the empirical loss-versus-compute trends continue, and whether lower loss keeps translating into useful capability. (stub, low) · ai
+- [[does-libghostty-s-abi-stability-policy-hold-across-releases]] — Version 1.0 promises a stable C ABI enforced in CI; it is untested over later releases, so whether the promise holds is open. (reviewed, low) · programming
+- [[does-the-hybrid-cascade-generalise-beyond-identity-resolution]] — Does a calibrated cheap scorer gating a frontier model cut cost without losing accuracy on other LLM-judge tasks, and how should one check calibration first? (reviewed, low) · ai
+- [[how-can-deceptive-behaviour-be-found-if-safety-training-can-hide-it]] — If backdoors can survive and even be hidden by safety training, what detection methods other than behavioural testing work? (reviewed, low) · ai
+- [[how-far-can-coding-agents-perceive-and-act-on-the-physical-world]] — Beep Locator (microphones) and a webcam-on-a-badge hack suggest agents can be given sensors; how general, reliable and safe is this? (reviewed, low) · ai
 - [[how-reliable-is-llm-as-a-judge-evaluation]] — When model-based graders agree with human judgment, and where they are biased. (stub, low) · ai
+- [[how-should-agent-permission-tiers-be-defined]] — Two sources propose read/write/destructive tiers with human approval for destructive actions; how do you classify actions that are write-only but hard to reverse, such as send or publish? (reviewed, low) · ai
+- [[how-should-multi-agent-systems-build-trust-and-coordination]] — Anthropic says coordination does not emerge from intelligence alone; mechanism design is open. (reviewed, low) · ai
+- [[when-does-a-single-agent-beat-multiple-subagents]] — Sources disagree or are second-hand about when to fan out; no controlled comparison is in the wiki. (reviewed, low) · ai
+- [[when-is-mcp-worth-its-overhead-compared-with-plain-function-calling]] — The source says MCP is overengineering for one model and a few tools; where is the threshold, given context cost and security surface? (reviewed, low) · ai
+- [[which-agent-harness-components-become-unnecessary-as-models-improve]] — Scaffolding encodes assumptions about model limits and may go stale; unclear which parts. (reviewed, low) · ai
+- [[why-do-llm-scaling-laws-take-the-form-of-a-power-law]] — Several hypotheses exist (data-manifold resolution, quantised skills), but none is settled. (reviewed, low) · ai
+
+## Entities
+
+- [[andrej-karpathy]] — AI researcher who coined 'vibe coding' and now describes agentic engineering and Software 3.0. (reviewed, low) · ai
+- [[anthropic]] — AI lab behind Claude and Claude Code; appears in these sources as publisher of research (sleeper agents), documentation, the Scion post, and as a subject of cost and incident reporting. (reviewed, low) · ai
+- [[beep-locator]] — Simon Willison's Claude-Code-built tool that triangulates a mysterious beep using several browser-based listener devices coordinated by a Python server. (reviewed, medium) · programming
+- [[beepbeep-acoustic-ranging]] — A 2007 paper describing a software-only acoustic ranging and localization system for commodity devices, used as the basis for Beep Locator. (reviewed, medium) · science
+- [[claude-code]] — Anthropic's coding agent harness, with hooks, subagents, skills and CLAUDE.md instruction files. (reviewed, low) · ai
+- [[deepseek-r1]] — DeepSeek-AI's reasoning model family trained with reinforcement learning, released with distilled smaller versions. (reviewed, medium) · ai
+- [[ghostty]] — A terminal emulator application whose core was extracted as libghostty. (reviewed, medium) · programming
+- [[hightouch]] — Company that publishes the identity-resolution LLM-judge benchmark; works with customer data, so its results are vendor claims. (reviewed, low) · business
+- [[hoffmann-et-al-2022-chinchilla-paper]] — The paper that re-derived compute-optimal training and argued most large models were undertrained. (reviewed, low) · ai
+- [[kaplan-et-al-2020-scaling-laws-paper]] — The paper that popularised LLM scaling laws, fitting power laws of loss in model size, data and compute. (reviewed, low) · ai
+- [[mitchell-hashimoto]] — Creator of the Ghostty terminal emulator (started 2022) and author of the libghostty 1.0 post. (reviewed, medium) · programming
+- [[openai-agents-sdk]] — OpenAI's lightweight framework with agents, handoffs, guardrails and tracing. (reviewed, low) · ai
+- [[openclaw]] — Open-source personal-agent project that started in November 2025 and gave its name to the 'Claw' category of general-purpose personal agents. (reviewed, low) · ai
+- [[owasp-top-10-for-agentic-applications]] — The OWASP GenAI Security Project's community-written list of the ten highest-impact security risks for agentic applications, version 2026 (December 2025). (reviewed, medium) · ai
+- [[paolo-perrone-the-ai-engineer]] — Author of The AI Engineer, a Substack newsletter of explainers and course-style issues on agents, RAG, inference and AI engineering careers. (reviewed, medium) · ai
+- [[positron-ai]] — AI inference-silicon startup with memory-first LPDDR designs (Atlas deployed, Asimov planned, Titan 2027), reportedly raising up to $875 million in September 2026. (reviewed, low) · business
+- [[pseudopeople]] — Tool from the Institute for Health Metrics and Evaluation (University of Washington) that simulates a fictional US town and generates realistic noisy records of its residents. (reviewed, low) · science
+- [[pstack]] — An open-source Cursor plugin of agent skills by Cursor engineer Lauren (poteto), built around agent self-verification and agent-driven PR merging. (reviewed, low) · programming
+- [[robert-c-martin-uncle-bob]] — Author of Clean Code, who says in 2026 interviews that he stopped reading agent-written code and builds machine-checked harnesses instead. (reviewed, low) · programming
+- [[scion]] — Anthropic's internal server-side version control system built for agent-heavy monorepos; not a general Git replacement and not publicly released. (reviewed, low) · programming
+- [[simon-willison]] — Independent developer and writer whose weblog and guides on LLMs and agentic engineering are cited widely; the vault already treats several of his pieces as sources. (reviewed, low) · ai
+
+## Sources
+
+- [[2026-in-llms-so-far-simon-willison]] — Willison's annotated keynote timeline of 2026: coding agents crossing a reliability line, Claws and personal agents, no-human-code factories, Mythos and Fable, token spending, and reported agent break-outs during training. (reviewed, medium) · ai
+- [[ai-agents-for-beginners-microsoft-course-repository]] — README of Microsoft's 18-lesson open course on building AI agents with Microsoft Agent Framework and Foundry; useful mainly as a syllabus of topics, with no lesson content ingested. (reviewed, low) · ai
+- [[karpathy-vibe-coding-to-agentic-engineering-sequoia-talk]] — Karpathy on Software 3.0, why he felt behind, and agentic engineering as preserving the quality bar of professional software. (reviewed, medium) · ai
+- [[anthropic-s-scion-replaces-git-ithome-article]] — A Taiwanese news article summarising Anthropic's engineering post on Scion, a server-side version control system for agent-heavy monorepos, with merge counts and checkout-time claims. (reviewed, low) · programming
+- [[attention-is-all-you-need-vaswani-et-al-2017]] — The original Transformer paper: an encoder-decoder model built only from attention, with machine-translation results. (reviewed, medium) · ai
+- [[best-practices-for-claude-code-docs]] — Official guidance on getting Claude Code to do what you want: what to tell it, giving it checks, enforcing rules with hooks, subagent costs. (reviewed, medium) · ai
+- [[building-effective-agents-anthropic]] — Anthropic's guidance: prefer simple composable patterns, separate workflows from agents, design tools carefully. Carries a note that tooling has changed since Dec 2024. (reviewed, medium) · ai
+- [[claude-code-multi-agent-orchestration-guide-moksa]] — A Chinese-language blog tutorial on Claude Code subagents: built-in subagents, scope priority, seven config examples, worktree isolation, cost tiering and pitfalls, with unsourced performance numbers. (reviewed, low) · ai
+- [[deepseek-r1-incentivizing-reasoning-capability-in-llms-via-reinforceme]] — The DeepSeek-R1 paper: pure reinforcement learning with rule-based rewards on a base model produces long-chain-of-thought reasoning (R1-Zero), then a multi-stage pipeline gives R1 and distilled smaller models. (reviewed, medium) · ai
+- [[how-coding-agents-work-willison]] — Explains a coding agent as an LLM plus system prompt plus tools in a loop: statelessness, replayed context, token caching, tool calls, reasoning. (reviewed, medium) · ai
+- [[how-i-use-ai-to-learn-things-eero-alvar-video]] — A creator explains and demos his AI learning system: measure the learner with quizzes, plan a path as a diagram, then teach one reasoning step at a time with verification and feedback. (reviewed, medium) · learning
+- [[i-looked-inside-my-agent-s-context-window-tech-with-tim-video]] — A sponsored test that gives Claude Code five different web-scraping tools for one price-shopping job and compares how many context tokens each uses, plus a three-question audit for any tool. (reviewed, low) · ai
+- [[karpathy-how-i-use-llms-re-uploaded-lecture]] — A third-party YouTube re-upload, under a clickbait title, of a roughly two-hour Andrej Karpathy practical lecture on using ChatGPT-style apps: context window, model tiers, thinking models, tools, deep research, vibe coding and multimodality. (reviewed, medium) · ai
+- [[learn-99-of-claude-code-in-one-video-tech-with-tim]] — A sponsored walkthrough of Claude Code's desktop app: models, effort levels, permission modes, plan mode, CLAUDE.md, memory, skills, subagents, MCP, hooks, plugins, mods, context commands, worktrees and routines. (reviewed, medium) · ai
+- [[libghostty-1-0-mitchell-hashimoto]] — Hashimoto's release post for libghostty-vt 1.0, a portable C terminal-emulation library with a stable, CI-enforced ABI, plus a list of adopters. (reviewed, medium) · programming
+- [[llm-judges-for-identity-resolution-at-4x-lower-cost-hightouch]] — Hightouch blog post benchmarking cheap "decision models" (Jev, GPT-6 Luna) and frontier LLMs as judges of over-merged identity profiles, and showing a confidence-gated hybrid with Opus. (reviewed, low) · ai
+- [[locating-the-source-of-a-mysterious-beep-with-claude-simon-willison]] — Willison's first-person account of having Claude Code build Beep Locator, a multi-device acoustic triangulation tool that found a beeping carbon monoxide detector, and of "giving Claude Code ears". (reviewed, medium) · ai
+- [[my-ai-skeptic-friends-are-all-nuts-thomas-ptacek-fly-io]] — A veteran developer's 2025 polemic that agent-based LLM coding is already useful, that hallucination is largely handled by tool feedback, and that developers should still read the code they merge. (reviewed, low) · programming
+- [[official-claude-code-extension-compromise-advisory-phorion]] — A macOS security vendor's technical advisory on a backdoored Claude Code for VS Code extension bundle on the Cursor Marketplace, with infection chain, detection ideas and indicators. (reviewed, medium) · programming
+- [[openai-agents-sdk-docs]] — Docs for OpenAI's Agents SDK: agents, handoffs/agents as tools, guardrails, tracing, sandbox agents. (reviewed, medium) · ai
+- [[owasp-top-10-for-agentic-applications-2026]] — The OWASP GenAI Security Project's December 2025 community document listing ten highest-impact agentic security risks (ASI01 to ASI10) with examples and mitigations. (reviewed, medium) · ai
+- [[patterns-and-problems-in-multiagent-systems-anthropic]] — Anthropic research on swarms of agents: gains from coordination, plus failures from conformity, weak epistemics and conflicting goals. (reviewed, medium) · ai
+- [[personal-agents-clearly-explained-jeff-su-video]] — A creator separates chatbots, do-it-yourself agents (memory in plain text files) and proactive personal agents such as Meta's Muse, and discusses lock-in and privacy trade-offs. (reviewed, low) · ai
+- [[positron-ai-funding-and-asimov-roadmap-x-ai-blog]] — A Taiwanese tech blog's careful recap of Positron's September 2026 funding announcement and chip roadmap, separating Atlas (deployed), Asimov (planned tape-out) and Titan (2027). (reviewed, low) · ai
+- [[positron-ai-vision-page]] — Positron's own vision statement for memory-first, LPDDR-based inference silicon, with market claims and performance claims that are marketing, not independent measurements. (reviewed, low) · ai
+- [[prompting-best-practices-claude-platform-docs]] — Anthropic's reference on prompting current Claude models: clarity, examples, XML tags, long context, formatting, tools, thinking and effort, and agentic prompts for state, autonomy and subagents. (reviewed, medium) · ai
+- [[pstack-how-a-cursor-engineer-lets-agents-merge-ai-ep435-video]] — A Chinese-language creator video on pstack, Cursor engineer Lauren's open-source skill pack for letting agents verify and merge their own PRs; description only, no transcript. (reviewed, low) · ai
+- [[scaling-laws-carefully-lilian-weng-2026]] — A long survey of LLM scaling laws: Kaplan, Chinchilla, why they disagree, data-limited regimes, and why fitting is fragile. (reviewed, medium) · ai
+- [[self-hosted-personal-finance-dashboard-built-with-claude-code-kevin-ki]] — A developer's account of building a large self-hosted finance app in 12 days with Claude Code, with lessons about design, early tests and scope. (reviewed, low) · programming
+- [[single-agent-patterns]] — Comparison of four single-agent reasoning patterns (ReAct, Plan-and-Execute, ReWOO, Reflexion) with strengths, ceilings, a selection flowchart and common hybrids. (reviewed, medium) · ai
+- [[sleeper-agents-deceptive-llms-that-persist-through-safety-training-ant]] — Abstract of Anthropic's 2024 research page: proof-of-concept backdoored models whose unsafe behaviour is not removed by supervised fine-tuning, RL or adversarial training. (reviewed, medium) · ai
+- [[sparks-of-weight-space-programming-takehi-et-al]] — A November 2026 research blog post reporting that a frontier LLM can read network weights to infer what they do, write small networks from scratch, and edit a small model's weights to fix a failure without training. (reviewed, low) · ai
+- [[four-levels-of-agentic-coding-amjad-video]] — A creator walks through Boris Cherny's levels of AI adoption: assisted, orchestrated, supervised autonomy, and beyond, with a verification-first workflow. (reviewed, medium) · ai
+- [[the-illustrated-transformer-jay-alammar]] — A widely used visual walkthrough of the Transformer, from encoder stacks to self-attention, multi-head attention and positional encoding. (reviewed, medium) · ai
+- [[the-saturday-5-2026-02-21]] — Weekly link roundup: Vercel cutting agent tools in favour of bash, an Anthropic paper on unpredictable failures, LangChain Deep Agents, a Rust Python sandbox, and Claude Code git safety hooks. Headlines only; none of the linked pages were read. (stub, low) · ai
+- [[the-saturday-5-2026-02-28]] — Weekly link roundup: a 2,000-hour Claude Code workflow write-up, Addy Osmani on context engineering replacing prompt engineering, a GPU performance curriculum, Alibaba's embedded vector database zvec, and GLiNER2. Headlines only. (stub, low) · ai
+- [[the-saturday-5-the-agent-stack-is-getting-real]] — Weekly link roundup: Karpathy's 243-line pure-Python GPT, a Phil Schmid walkthrough of the Agent Client Protocol, 'seeing like an agent' from the Claude Code team, Cloudflare's self-hosted agent, and OpenAI's open-sourced data agent. Headlines only. (stub, low) · ai
+- [[uncle-bob-on-not-reading-agent-written-code-jim-ai-notebook-video]] — A Chinese-language creator video summarising two interviews in which Robert C. Martin says he stopped reading agent-written code and relies on machine-checked constraints; only the description was available, not the transcript. (reviewed, low) · ai
+- [[using-git-with-coding-agents-simon-willison]] — A chapter of Willison's Agentic Engineering Patterns guide: Git as the safety net for agents, plus prompts for merge conflicts, recovering lost work, bisect and history rewriting. (reviewed, medium) · programming
+- [[what-are-ai-agent-guardrails]] — Explainer on agent guardrails: six guardrail layers, Willison's lethal trifecta and Meta's Rule of Two, the two-tier cheap-check-then-LLM-judge pattern (Ramp), and why system prompts cannot enforce safety. (reviewed, medium) · ai
+- [[what-comes-after-loops-amjad-video]] — A creator's recap of a talk on the ladder from one agent to swarms: fan-out, effort scaling, builder-reviewer-verifier pairs, manager threads. (reviewed, medium) · ai
+- [[what-is-agentic-engineering-willison]] — Willison defines agents as tools run in a loop, and agentic engineering as software development with coding agents, distinct from vibe coding. (reviewed, medium) · ai
+- [[what-is-an-ai-agent]] — Beginner-to-intermediate explainer (Issue #1 of The AI Engineer): an agent is an LLM in a think-act-observe loop with tools and memory; cites Klarna, Shopify Sidekick and Deloitte/Gartner adoption figures second-hand. (reviewed, medium) · ai
+- [[what-is-function-calling]] — Explainer of function calling as the 'act' step of an agent: the five-step JSON-schema flow, how it relates to tool use and MCP, and its production pitfalls (context cost, argument extraction, security, error handling). (reviewed, medium) · ai
+- [[what-is-mcp]] — Explainer of the Model Context Protocol: the N-by-M integration problem, the host/client/server architecture with tools, resources and prompts, adoption by major vendors, and security and context-cost drawbacks. (reviewed, medium) · ai
+- [[why-ai-agents-keep-failing-in-production]] — Essay naming three production failure patterns (dumb RAG, brittle connectors, compounding error) with incident examples, the 85%-per-step arithmetic, and a read/write/destructive permission framework. (reviewed, medium) · ai
+- [[why-anthropic-stopped-using-git-scion-andy-lin-video]] — A creator's summary of two other creators' readings of Anthropic's Scion post: why Git strained, Scion's six rules and three cache layers, speed comparisons and what ordinary developers can borrow. (reviewed, low) · programming
+- [[why-everybody-is-losing-money-on-ai-ed-zitron]] — A sceptical newsletter argument (September 2025) that generative AI providers and the companies built on them are unprofitable and that inference costs are rising; only the free opening section was ingested. (reviewed, low) · business
+- [[zero-to-one-learning-agentic-patterns-schmid]] — A pattern catalogue: three workflow patterns and four agentic patterns, each with use cases, built from raw API calls. (reviewed, medium) · ai

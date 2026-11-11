@@ -1,9 +1,41 @@
-# Controlled vocabulary of knowledge domains. Add deliberately; every page must use these.
-ai: Artificial intelligence, ML, LLMs, agents
-programming: Software engineering, tools, systems
-work: Work documents, projects, processes, decisions
-business: Strategy, products, markets, finance
-science: Natural sciences, math, research methods
-health: Body, mind, medicine, habits
-learning: Learning methods, thinking, productivity
-personal: Personal decisions, preferences, life admin
+# Subjects (domains). Every page belongs to at least one. Add new subjects from the app or here.
+ai:
+  name: AI & Machine Learning
+  description: Artificial intelligence, ML, LLMs, agents
+  color: '#7c93ff'
+  icon: 🧠
+programming:
+  name: Programming
+  description: Software engineering, tools, systems
+  color: '#4cc38a'
+  icon: 💻
+work:
+  name: Work
+  description: Work documents, projects, processes, decisions
+  color: '#e8a33d'
+  icon: 💼
+business:
+  name: Business
+  description: Strategy, products, markets, finance
+  color: '#e5686a'
+  icon: 📈
+science:
+  name: Science & Math
+  description: Natural sciences, math, research methods
+  color: '#4cb8c4'
+  icon: 🧪
+health:
+  name: Health
+  description: Body, mind, medicine, habits
+  color: '#b07cf0'
+  icon: ❤️
+learning:
+  name: Learning
+  description: Learning methods, thinking, productivity
+  color: '#e07ab8'
+  icon: 🎓
+personal:
+  name: Personal
+  description: Personal decisions, preferences, life admin
+  color: '#8aa05a'
+  icon: 🏡
