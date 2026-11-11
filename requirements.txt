@@ -3,3 +3,7 @@ yt-dlp
 youtube-transcript-api
 pypdf
 pyyaml
+fastapi
+uvicorn
+python-multipart
+httpx

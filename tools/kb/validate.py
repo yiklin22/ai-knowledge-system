@@ -26,6 +26,15 @@ def _date(v):
         return None
 
 
+def raw_file(root: Path, raw) -> Path | None:
+    """The file a source page's `raw` field names, or None unless it is an existing file inside raw/.
+    Evidence may only be checked against immutable sources: a path into proposals/ (text the agent wrote itself),
+    an absolute path or a ../ escape would let an invented quote pass as verbatim."""
+    base = (root / "raw").resolve()
+    f = (root / str(raw)).resolve()
+    return f if base in f.parents and f.is_file() else None
+
+
 def _norm(s):
     return re.sub(r"\s+", " ", str(s)).strip().lower()
 
@@ -108,8 +117,8 @@ def validate(pages: list[Page], domains: set[str], root: Path = ROOT, today=None
             raw, url = fm.get("raw"), fm.get("url")
             if not raw and not url:
                 err(p, "source needs 'raw' or 'url'")
-            if raw and not (root / raw).is_file():
-                err(p, f"raw file not found: {raw}")
+            if raw and not raw_file(root, raw):
+                err(p, f"raw file not found inside raw/: {raw}")
         if fm["type"] == "concept":
             for r in fm.get("recall") or []:
                 if not (isinstance(r, dict) and r.get("q") and r.get("a")):
@@ -148,9 +157,9 @@ def validate(pages: list[Page], domains: set[str], root: Path = ROOT, today=None
                     err(p, f"quote from {s['id']} needs a locator")
                 src = by_id[s["id"]].fm
                 raw = src.get("raw")
-                if not raw or not (root / raw).is_file():
+                if not raw or not raw_file(root, raw):
                     err(p, f"cannot verify quote: source {s['id']} has no raw file")
-                elif _norm(q) not in _norm((root / raw).read_text(encoding="utf-8", errors="replace")):
+                elif _norm(q) not in _norm(raw_file(root, raw).read_text(encoding="utf-8", errors="replace")):
                     err(p, f"quote not found verbatim in {raw}: {q[:60]!r}")
 
     # --- relations & links ---

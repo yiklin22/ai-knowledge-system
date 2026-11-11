@@ -1,0 +1,20 @@
+{"q": "How much more do output tokens cost than input tokens for Opus 4.7?", "expect": ["raw/web/2026-11-10-the-pulse-interesting-ai-coding-stats-from-cursor.md"]}
+{"q": "What fraction of the cost of AI coding agents comes from input tokens at Cursor?", "expect": ["raw/web/2026-11-10-the-pulse-interesting-ai-coding-stats-from-cursor.md"]}
+{"q": "Why is it better to hold a separate meeting to decide action items after an incident review?", "expect": ["raw/web/2026-11-10-incident-review-and-postmortem-best-practices.md"]}
+{"q": "Why can an AI security scan return different findings on the same codebase every run?", "expect": ["raw/web/2026-11-10-a-crash-course-in-verifying-agent-code.md"]}
+{"q": "How did Uber's 2022 change to engineering levels affect former Google engineers above senior?", "expect": ["raw/web/2026-11-10-uber-s-engineering-level-changes.md"]}
+{"q": "What is a denoising autoencoder and how is it trained?", "expect": ["raw/web/2026-11-10-autoencoders-and-diffusers-a-brief-comparison.md"]}
+{"q": "How does the minimal chat prototype find items similar to the one the user picked?", "expect": ["raw/web/2026-11-10-interacting-with-llms-with-minimal-chat.md"]}
+{"q": "What happened to startup founders who could not log in to Silicon Valley Bank before the weekend ended?", "expect": ["raw/web/2026-11-10-the-collapse-of-silicon-valley-bank.md"]}
+{"q": "What three kinds of nodes does the restaurant search knowledge graph in Neo4j contain?", "expect": ["raw/web/2026-11-10-search-query-matching-via-lexical-graph-and-embedding-method.md"]}
+{"q": "What should I put in the accomplishments section of a software engineer's performance self-review?", "expect": ["raw/web/2026-11-10-writing-a-performance-self-review-for-software-engineers-wit.md"]}
+{"q": "What do developers say they use AI coding tools for, such as boilerplate and tests?", "expect": ["raw/web/2026-11-10-an-explosion-in-software-engineers-using-ai-coding-tools.md"]}
+{"q": "Which tech companies have engineers in Ukraine and how did EPAM relocate its staff?", "expect": ["raw/web/2026-11-10-the-ukraine-crisis-and-its-impact-on-the-tech-industry.md"]}
+{"q": "How does the Transformer decoder stop a position from attending to later positions?", "expect": ["raw/documents/2026-11-08-attention-is-all-you-need.md"]}
+{"q": "What does the position-wise feed-forward layer in each Transformer layer do?", "expect": ["raw/documents/2026-11-08-attention-is-all-you-need.md"]}
+{"q": "How many tokens would the full Best Buy page use compared with the Opus context window?", "expect": ["raw/videos/2026-11-08-i-looked-inside-my-agents-context-window.md"]}
+{"q": "How do personal agents remember my rules and preferences between tasks?", "expect": ["raw/videos/2026-11-08-personal-agents-clearly-explained.md"]}
+{"q": "Which Python frameworks were used to build the same CSV upload and edit app with htmx?", "expect": ["raw/web/2026-11-10-building-the-same-app-using-various-web-frameworks.md"]}
+{"q": "What is an agent harness?", "expect": ["vault/concepts/agent-harness.md"]}
+{"q": "How does prompt injection work?", "expect": ["vault/concepts/prompt-injection.md"]}
+{"q": "What is self-attention?", "expect": ["vault/concepts/self-attention.md"]}

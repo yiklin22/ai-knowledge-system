@@ -9,7 +9,7 @@ import string
 import sys
 from pathlib import Path
 
-from . import graphview, index, learning
+from . import index, learning, metrics, ops
 from .parse import Page, load_dir, parse_text, slugify
 from .schema import ROOT, SCHEMA_VERSION, TYPES, TYPE_ENUMS
 from .validate import human_blocks_preserved, load_domains, validate
@@ -43,9 +43,12 @@ def new_id(prefix, taken: set[str]) -> str:
 def all_pages(include_proposals=False, batch=None):
     pages = load_dir(VAULT)
     if include_proposals:
+        proposed = []
         for b in sorted(PROPOSALS.glob("*/")):
             if b.is_dir() and (batch is None or b.name == batch):
-                pages += load_dir(b)
+                proposed += load_dir(b)
+        amended = {p.id for p in proposed if p.id}  # a proposal with an existing id replaces that page (amendment)
+        pages = [p for p in pages if p.id not in amended] + proposed
     return pages
 
 
@@ -61,7 +64,6 @@ def cmd_new(a):
     folder, prefix = TYPES[a.type]
     taken = {p.id for p in all_pages(True)}
     pid = new_id(prefix, taken)
-    d = PROPOSALS / a.batch / folder
     d = PROPOSALS / a.batch / folder
     d.mkdir(parents=True, exist_ok=True)
     path = d / f"{slugify(a.title)}.md"
@@ -117,49 +119,20 @@ def cmd_search(a):
 
 
 def cmd_approve(a):
-    batch = PROPOSALS / a.batch
-    if not batch.is_dir():
-        sys.exit(f"no such batch: {a.batch}")
-    vault_pages = load_dir(VAULT)
-    new_pages = load_dir(batch)
-    if not new_pages:
-        sys.exit("batch is empty")
-    by_id = {p.id: p for p in vault_pages if p.id}
-    amended = [p for p in new_pages if p.id in by_id]
-    merged = [p for p in vault_pages if p.id not in {n.id for n in new_pages}] + new_pages
-    errors, warnings = validate(merged, load_domains(VAULT), check_orphans=False)
-    if amended and not a.amend:
-        errors.append("batch modifies existing pages " + ", ".join(p.path.name for p in amended) + " (re-run with --amend after reviewing)")
-    for p in amended:
-        old = by_id[p.id]
-        lost = human_blocks_preserved(old.body, p.body)
-        if lost:
-            errors.append(f"{p.path.name}: would remove/alter human-authored text: {lost[0][:60]!r}")
-        if a.amend:
-            sys.stdout.writelines(difflib.unified_diff(old.path.read_text().splitlines(True), p.path.read_text().splitlines(True),
-                                                        f"vault/{old.path.name}", f"proposal/{p.path.name}"))
-    for p in new_pages:
-        if p.id not in by_id:
-            for v in vault_pages:
-                if v.path.name == p.path.name:
-                    errors.append(f"{p.path.name}: filename already used by {v.id}")
-    report(errors, warnings)
-    if errors:
-        sys.exit("not approved")
-    log = []
-    for p in new_pages:
-        folder = TYPES[p.fm["type"]][0]
-        dest = (by_id[p.id].path if p.id in by_id else VAULT / folder / p.path.name)
-        text = p.path.read_text(encoding="utf-8")
-        if p.id not in by_id and p.fm["status"] == "draft":  # human approval makes it reviewed
-            text = re.sub(r"^status: draft", "status: reviewed", text, count=1, flags=re.M)
-        dest.write_text(text, encoding="utf-8")
-        log.append(f"- {'amended' if p.id in by_id else 'added'} {dest.relative_to(ROOT)} ({p.id})")
-    with open(VAULT / "log.md", "a", encoding="utf-8") as f:
-        f.write(f"\n## [{TODAY}] approve | {a.batch}\n" + "\n".join(log) + "\n")
-    shutil.rmtree(batch)
-    print("\n".join(log))
-    cmd_build()
+    """HUMAN ONLY. Thin wrapper over ops.approve_batch (shared with the web app)."""
+    rep = ops.batch_report(ROOT, a.batch)
+    if a.amend:
+        for f in rep.get("files", []):
+            if f["action"] == "amend":
+                sys.stdout.write(ops.batch_diff(ROOT, a.batch, f["name"])["diff"])
+    res = ops.approve_batch(ROOT, a.batch, amend=a.amend)
+    if not res["ok"]:
+        report(res["errors"], res["warnings"])
+        sys.exit("not approved" + (" (re-run with --amend after reviewing)" if rep.get("has_amendments") and not a.amend else ""))
+    report([], res["warnings"])
+    print("\n".join(res["log"]))
+    r = res["rebuild"]
+    print(f"built {r.get('pages', 0)} pages; cards +{r.get('cards_added', 0)} -{r.get('cards_removed', 0)}" if r.get("ok") else f"rebuild failed: {r['errors']}")
 
 
 def cmd_status(a):
@@ -223,7 +196,9 @@ def cmd_tutor(a):
     print("unlocks:", ", ".join(unlocks) or "none")
     for key in ("probes", "misconceptions"):
         if p.fm.get(key):
-            print(f"{key} (from the vault):"); [print("  -", x) for x in p.fm[key]]
+            print(f"{key} (from the vault):")
+            for x in p.fm[key]:
+                print("  -", f"{x['q']}  [good answer shows: {x['looks_for']}]" if isinstance(x, dict) else x)
     mc = learning.open_misconceptions(con, p.id)
     print("misconceptions this learner showed before (unresolved):", mc or "none")
     for r in p.fm.get("relations") or []:
@@ -246,11 +221,11 @@ def cmd_record(a):
     print(f"recorded for {p.fm['title']}: level={a.level} +{len(a.misconception)} misconception(s), {len(a.resolved)} resolved")
 
 
-def cmd_graph(a):
-    pages = load_dir(VAULT)
-    out = ROOT / "build" / "graph.html"
-    graphview.write(pages, learning.mastery_map(learning.connect()), out)
-    print(f"wrote {out.relative_to(ROOT)}  (open it in a browser)")
+def cmd_metrics(a):
+    text = metrics.render(metrics.summary(metrics.load(ROOT)))
+    print(text)
+    if a.write:
+        Path(a.write).write_text(text, encoding="utf-8")
 
 
 def main(argv=None):
@@ -273,6 +248,7 @@ def main(argv=None):
     s.add_argument("page"); s.add_argument("--level", type=int); s.add_argument("--note")
     s.add_argument("--misconception", action="append", default=[]); s.add_argument("--resolved", action="append", default=[])
     s.set_defaults(f=cmd_record)
-    sub.add_parser("graph", help="write build/graph.html").set_defaults(f=cmd_graph)
+    s = sub.add_parser("metrics", help="cost, latency and approval rate from real use")
+    s.add_argument("--write", metavar="FILE"); s.set_defaults(f=cmd_metrics)
     a = ap.parse_args(argv)
     a.f(a)
