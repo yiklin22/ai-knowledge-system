@@ -1,0 +1,11 @@
+# Subjects for the sample vault.
+ai:
+  name: AI & Machine Learning
+  description: Artificial intelligence, ML, LLMs, agents
+  color: '#7c93ff'
+  icon: 🧠
+programming:
+  name: Programming
+  description: Software engineering, tools, systems
+  color: '#4cc38a'
+  icon: 💻
