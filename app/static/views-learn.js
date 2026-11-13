@@ -212,7 +212,7 @@ function openPalette() {
   };
   const paint = () => { $("#pl").innerHTML = items.map((it, i) => `<div class="pi ${i === sel ? "on" : ""}" data-i="${i}"><span>${esc(it.i)}</span><b>${esc(it.t)}</b><span class="muted small">${esc(it.kind)}</span></div>`).join("") || "<div class='muted' style='padding:12px'>No matches.</div>"; $$(".pi", d).forEach(e => { e.onmousemove = () => { sel = +e.dataset.i; $$(".pi", d).forEach((x, j) => x.classList.toggle("on", j === sel)); }; e.onclick = () => { close(); items[+e.dataset.i].run(); }; }); };
   const q = $("#pq"); q.focus(); q.oninput = () => build(q.value);
-  q.onkeydown = e => { if (e.key === "Escape") close(); else if (e.key === "ArrowDown") { e.preventDefault(); sel = Math.min(items.length - 1, sel + 1); paint(); } else if (e.key === "ArrowUp") { e.preventDefault(); sel = Math.max(0, sel - 1); paint(); } else if (e.key === "Enter" && items[sel]) { close(); items[sel].run(); } };
+  q.onkeydown = e => { if (e.isComposing || e.keyCode === 229) return;  /* IME-safe: keys that pick a candidate stay with the IME */ if (e.key === "Escape") close(); else if (e.key === "ArrowDown") { e.preventDefault(); sel = Math.min(items.length - 1, sel + 1); paint(); } else if (e.key === "ArrowUp") { e.preventDefault(); sel = Math.max(0, sel - 1); paint(); } else if (e.key === "Enter" && items[sel]) { close(); items[sel].run(); } };
   build("");
 }
 addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); openPalette(); } });

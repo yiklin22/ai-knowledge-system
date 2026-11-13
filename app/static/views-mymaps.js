@@ -146,7 +146,7 @@ routes.mymap = async ([id]) => {
     const nb = byId();
     openDialog(`<h2 style="margin-top:0">How are they connected?</h2><p><b>${esc(nb[from].label)}</b> → <b>${esc(nb[to].label)}</b></p><input id="l-label" type="text" placeholder="e.g. leads to (optional)" autocomplete="off"><div class="row" style="margin-top:8px">${LINK_SUGGEST.map(s => `<button class="ghost sug">${s}</button>`).join("")}</div><div class="row" style="justify-content:flex-end;margin-top:14px"><button class="ghost" id="l-c">Cancel</button><button id="l-ok">Add link</button></div>`, (d, close) => {
       const inp = $("#l-label", d); inp.focus(); $$(".sug", d).forEach(b => b.onclick = () => { inp.value = b.textContent; inp.focus(); });
-      const ok = () => { snapshot(); const e = addEdge(from, to, inp.value.trim().slice(0, 40)); close(); if (e) sel = { type: "edge", id: e.id }; changed(false); }; $("#l-ok", d).onclick = ok; inp.onkeydown = e => { if (e.key === "Enter") ok(); }; $("#l-c", d).onclick = close;
+      const ok = () => { snapshot(); const e = addEdge(from, to, inp.value.trim().slice(0, 40)); close(); if (e) sel = { type: "edge", id: e.id }; changed(false); }; $("#l-ok", d).onclick = ok; inp.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); if (e.isComposing || e.keyCode === 229) return; ok(); } };  // IME-safe: Enter that confirms a Chinese/Japanese/Korean candidate must not submit $("#l-c", d).onclick = close;
     });
   }
   const fitSoon = () => { fit(); draw(); };
